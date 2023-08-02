@@ -42,6 +42,8 @@ class DocumentScannerView @JvmOverloads constructor(
         Log.i(javaClass.simpleName, "loading = $it")
     }
 
+    private var imageValidListener: OnImageValidListener? = null
+
     private val lifecycle: LifecycleOwner
         get() = findViewTreeLifecycleOwner()!!
 
@@ -57,6 +59,9 @@ class DocumentScannerView @JvmOverloads constructor(
                 holder = findViewById(R.id.holder)
                 image = findViewById(R.id.image)
                 polygonView = findViewById(R.id.polygon_view)
+                polygonView.setImageValidListener(PolygonView.OnImageValidListener { isValid ->
+                    imageValidListener?.invoke(isValid)
+                })
                 isInitialized = true
             }
         }
@@ -191,4 +196,10 @@ class DocumentScannerView @JvmOverloads constructor(
     fun setOnLoadListener(listener: OnLoadListener?) {
         onLoad = listener
     }
+
+    fun setImageValidListener(listener: OnImageValidListener){
+        this.imageValidListener = listener
+    }
+
+
 }

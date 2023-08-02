@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
@@ -30,6 +31,13 @@ class ImageCropActivity : AppCompatActivity() {
             binding.progressBar.isVisible = loading
         }
         binding.documentScanner.setImage(bitmap)
+        binding.documentScanner.setImageValidListener { isValid ->
+            if (isValid) {
+                binding.tvImageInvalid.visibility = View.GONE
+            } else {
+                binding.tvImageInvalid.visibility = View.VISIBLE
+            }
+        }
         binding.btnImageCrop.setOnClickListener {
             lifecycleScope.launch {
                 binding.progressBar.isVisible = true

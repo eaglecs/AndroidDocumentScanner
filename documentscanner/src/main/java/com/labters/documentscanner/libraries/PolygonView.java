@@ -24,10 +24,17 @@ import android.widget.Magnifier;
 
 import com.labters.documentscanner.R;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 /**
  * Created by jhansi on 28/03/15.
@@ -102,14 +109,21 @@ public class PolygonView extends FrameLayout {
 
     private void initPaint() {
         paint = new Paint();
+        handleImageValid(true);
         paint.setColor(getResources().getColor(R.color.blue));
         paint.setStrokeWidth(2);
         paint.setAntiAlias(true);
     }
 
+    private void handleImageValid(Boolean isValid) {
+        if (imageValidListener != null) {
+            imageValidListener.onListener(isValid);
+        }
+    }
+
     public Map<Integer, PointF> getPoints() {
 
-        List<PointF> points = new ArrayList<PointF>();
+        List<PointF> points = new ArrayList<>();
         points.add(new PointF(pointer1.getX(), pointer1.getY()));
         points.add(new PointF(pointer2.getX(), pointer2.getY()));
         points.add(new PointF(pointer3.getX(), pointer3.getY()));
@@ -149,9 +163,8 @@ public class PolygonView extends FrameLayout {
         }
     }
 
-    public void setPointColor(int color)
-    {
-        if (paint!=null)
+    public void setPointColor(int color) {
+        if (paint != null)
             paint.setColor(color);
     }
 
@@ -172,30 +185,73 @@ public class PolygonView extends FrameLayout {
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        canvas.drawLine(pointer1.getX() + (pointer1.getWidth() / 2), pointer1.getY() + (pointer1.getHeight() / 2), pointer3.getX() + (pointer3.getWidth() / 2), pointer3.getY() + (pointer3.getHeight() / 2), paint);
-        canvas.drawLine(pointer1.getX() + (pointer1.getWidth() / 2), pointer1.getY() + (pointer1.getHeight() / 2), pointer2.getX() + (pointer2.getWidth() / 2), pointer2.getY() + (pointer2.getHeight() / 2), paint);
-        canvas.drawLine(pointer2.getX() + (pointer2.getWidth() / 2), pointer2.getY() + (pointer2.getHeight() / 2), pointer4.getX() + (pointer4.getWidth() / 2), pointer4.getY() + (pointer4.getHeight() / 2), paint);
-        canvas.drawLine(pointer3.getX() + (pointer3.getWidth() / 2), pointer3.getY() + (pointer3.getHeight() / 2), pointer4.getX() + (pointer4.getWidth() / 2), pointer4.getY() + (pointer4.getHeight() / 2), paint);
-        midPointer13.setX(pointer3.getX() - ((pointer3.getX() - pointer1.getX()) / 2));
-        midPointer13.setY(pointer3.getY() - ((pointer3.getY() - pointer1.getY()) / 2));
-        midPointer24.setX(pointer4.getX() - ((pointer4.getX() - pointer2.getX()) / 2));
-        midPointer24.setY(pointer4.getY() - ((pointer4.getY() - pointer2.getY()) / 2));
-        midPointer34.setX(pointer4.getX() - ((pointer4.getX() - pointer3.getX()) / 2));
-        midPointer34.setY(pointer4.getY() - ((pointer4.getY() - pointer3.getY()) / 2));
-        midPointer12.setX(pointer2.getX() - ((pointer2.getX() - pointer1.getX()) / 2));
-        midPointer12.setY(pointer2.getY() - ((pointer2.getY() - pointer1.getY()) / 2));
+        ImageView tmpPointer1;
+        ImageView tmpPointer2;
+        ImageView tmpPointer3;
+        ImageView tmpPointer4;
+        if (isValidShape(getPoints())) {
+            List<ImageView> points = new ArrayList<>();
+            points.add(pointer1);
+            points.add(pointer2);
+            points.add(pointer3);
+            points.add(pointer4);
+            Collections.sort(points, (obj1, obj2) -> Float.compare(obj1.getY(), obj2.getY()));
+            ImageView imageViewSort1 = points.get(0);
+            ImageView imageViewSort2 = points.get(1);
+            ImageView imageViewSort3 = points.get(2);
+            ImageView imageViewSort4 = points.get(3);
+
+            if (imageViewSort1.getX() > imageViewSort2.getX()) {
+                tmpPointer1 = imageViewSort2;
+                tmpPointer2 = imageViewSort1;
+            } else {
+                tmpPointer1 = imageViewSort1;
+                tmpPointer2 = imageViewSort2;
+            }
+            if (imageViewSort3.getX() > imageViewSort4.getX()) {
+                tmpPointer3 = imageViewSort4;
+                tmpPointer4 = imageViewSort3;
+            } else {
+                tmpPointer3 = imageViewSort3;
+                tmpPointer4 = imageViewSort4;
+            }
+        } else {
+            tmpPointer1 = pointer1;
+            tmpPointer2 = pointer2;
+            tmpPointer3 = pointer3;
+            tmpPointer4 = pointer4;
+        }
+
+        int haftWidthPointer1 = tmpPointer1.getWidth() / 2;
+        int haftHeightPointer1 = tmpPointer1.getHeight() / 2;
+        int haftWidthPointer2 = tmpPointer2.getWidth() / 2;
+        int haftHeightPointer2 = tmpPointer2.getHeight() / 2;
+        int haftWidthPointer3 = tmpPointer3.getWidth() / 2;
+        int haftHeightPointer3 = tmpPointer3.getHeight() / 2;
+        int haftWidthPointer4 = tmpPointer4.getWidth() / 2;
+        int haftHeightPointer4 = tmpPointer4.getHeight() / 2;
+        canvas.drawLine(tmpPointer1.getX() + haftWidthPointer1, tmpPointer1.getY() + haftHeightPointer1, tmpPointer3.getX() + haftWidthPointer3, tmpPointer3.getY() + haftHeightPointer3, paint);
+        canvas.drawLine(tmpPointer1.getX() + haftWidthPointer1, tmpPointer1.getY() + haftHeightPointer1, tmpPointer2.getX() + haftWidthPointer2, tmpPointer2.getY() + haftHeightPointer2, paint);
+        canvas.drawLine(tmpPointer2.getX() + haftWidthPointer2, tmpPointer2.getY() + haftHeightPointer2, tmpPointer4.getX() + haftWidthPointer4, tmpPointer4.getY() + haftHeightPointer4, paint);
+        canvas.drawLine(tmpPointer3.getX() + haftWidthPointer3, tmpPointer3.getY() + haftHeightPointer3, tmpPointer4.getX() + haftWidthPointer4, tmpPointer4.getY() + haftHeightPointer4, paint);
+        midPointer13.setX(tmpPointer3.getX() - ((tmpPointer3.getX() - tmpPointer1.getX()) / 2));
+        midPointer13.setY(tmpPointer3.getY() - ((tmpPointer3.getY() - tmpPointer1.getY()) / 2));
+        midPointer24.setX(tmpPointer4.getX() - ((tmpPointer4.getX() - tmpPointer2.getX()) / 2));
+        midPointer24.setY(tmpPointer4.getY() - ((tmpPointer4.getY() - tmpPointer2.getY()) / 2));
+        midPointer34.setX(tmpPointer4.getX() - ((tmpPointer4.getX() - tmpPointer3.getX()) / 2));
+        midPointer34.setY(tmpPointer4.getY() - ((tmpPointer4.getY() - tmpPointer3.getY()) / 2));
+        midPointer12.setX(tmpPointer2.getX() - ((tmpPointer2.getX() - tmpPointer1.getX()) / 2));
+        midPointer12.setY(tmpPointer2.getY() - ((tmpPointer2.getY() - tmpPointer1.getY()) / 2));
     }
 
-    private void drawMag(float x,float y)
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && magnifier!=null) {
+    private void drawMag(float x, float y) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && magnifier != null) {
             magnifier.show(x, y);
         }
     }
 
-    private void dismissMag()
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && magnifier!=null) {
+    private void dismissMag() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && magnifier != null) {
             magnifier.dismiss();
         }
     }
@@ -209,6 +265,20 @@ public class PolygonView extends FrameLayout {
         imageView.setY(y);
         imageView.setOnTouchListener(new TouchListenerImpl());
         return imageView;
+    }
+
+    public void setImageValidListener(@Nullable Function1<? super Boolean, Unit> listener) {
+
+    }
+
+    private OnImageValidListener imageValidListener;
+
+    public void setImageValidListener(OnImageValidListener l) {
+        imageValidListener = l;
+    }
+
+    public interface OnImageValidListener {
+        void onListener(Boolean isValid);
     }
 
     private class MidPointTouchListenerImpl implements OnTouchListener {
@@ -254,7 +324,7 @@ public class PolygonView extends FrameLayout {
                             mainPointer1.setX((int) (mainPointer1.getX() + mv.x));
                         }
                     }
-                    drawMag(StartPT.x+50,StartPT.y+50);
+                    drawMag(StartPT.x + 50, StartPT.y + 50);
                     break;
                 case MotionEvent.ACTION_DOWN:
                     DownPT.x = event.getX();
@@ -263,7 +333,9 @@ public class PolygonView extends FrameLayout {
                     break;
                 case MotionEvent.ACTION_UP:
                     int color = 0;
-                    if (isValidShape(getPoints())) {
+                    boolean validShape = isValidShape(getPoints());
+                    handleImageValid(validShape);
+                    if (validShape) {
                         color = getResources().getColor(R.color.blue);
                     } else {
                         color = getResources().getColor(R.color.orange);
@@ -303,7 +375,7 @@ public class PolygonView extends FrameLayout {
                         v.setX((int) (StartPT.x + mv.x));
                         v.setY((int) (StartPT.y + mv.y));
                         StartPT = new PointF(v.getX(), v.getY());
-                        drawMag(StartPT.x+50,StartPT.y+50);
+                        drawMag(StartPT.x + 50, StartPT.y + 50);
                     }
                     break;
                 case MotionEvent.ACTION_DOWN:
@@ -313,7 +385,9 @@ public class PolygonView extends FrameLayout {
                     break;
                 case MotionEvent.ACTION_UP:
                     int color = 0;
-                    if (isValidShape(getPoints())) {
+                    boolean validShape = isValidShape(getPoints());
+                    handleImageValid(validShape);
+                    if (validShape) {
                         color = getResources().getColor(R.color.blue);
                     } else {
                         color = getResources().getColor(R.color.orange);

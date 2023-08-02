@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1111 && resultCode == RESULT_OK && data != null) {
             startActivity(ImageCropActivity.newIntent(this, data.data.toString()))
-        } else if (requestCode == 1231 && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == 1231) {
             startActivity(ImageCropActivity.newIntent(this, photoPath))
         }
     }
