@@ -52,14 +52,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         btnPick = findViewById(R.id.btnPick)
         imgBitmap = findViewById(R.id.imgBitmap)
-        askPermission()
+//        askPermission()
     }
 
-    fun askPermission() {
+    private fun askPermission() {
         if (
             ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(
                 this,
@@ -96,8 +96,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun setView() {
-        btnPick.setOnClickListener(View.OnClickListener {
+    private fun setView() {
+        btnPick.setOnClickListener {
             val builder = AlertDialog.Builder(this@MainActivity)
             builder.setTitle("MaliY")
             builder.setMessage("Where would you like to choose the image?")
@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
             }
             val dialog: AlertDialog = builder.create()
             dialog.show()
-        })
+        }
     }
 
     @SuppressLint("SimpleDateFormat")

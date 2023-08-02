@@ -8,5 +8,5 @@
   -->
 
 <resources>
-    <string name="app_name">DocumentScannerAndroid</string>
+    <string name="app_name">CamDocScanner</string>
 </resources>
