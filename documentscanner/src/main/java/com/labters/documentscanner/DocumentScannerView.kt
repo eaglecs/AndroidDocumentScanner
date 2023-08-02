@@ -7,10 +7,13 @@ import android.graphics.PointF
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
+import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnAttach
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -25,11 +28,66 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.opencv.core.MatOfPoint2f
-import java.util.*
 
-class DocumentScannerView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr) {
+class DocumentScannerView : FrameLayout{
+
+    constructor(context: Context) : super(context){
+        inflate(context, R.layout.document_scanner, this).run {
+            doOnAttach {
+                holder = findViewById(R.id.holder)
+                image = findViewById(R.id.image)
+                polygonView = findViewById(R.id.polygon_view)
+                polygonView.setImageValidListener(PolygonView.OnImageValidListener { isValid ->
+                    imageValidListener?.invoke(isValid)
+                })
+                isInitialized = true
+                // handle Styleable
+            }
+        }
+    }
+    constructor(context: Context, attrs: AttributeSet?) : super(
+        context, attrs
+    ){
+        handleStyleable(context, attrs, 0)
+        inflate(context, R.layout.document_scanner, this).run {
+            doOnAttach {
+                holder = findViewById(R.id.holder)
+                image = findViewById(R.id.image)
+                polygonView = findViewById(R.id.polygon_view)
+                polygonView.setImageValidListener(PolygonView.OnImageValidListener { isValid ->
+                    imageValidListener?.invoke(isValid)
+                })
+                isInitialized = true
+                // handle Styleable
+                polygonView.initStyleable(
+                    frameColor, frameColorError, handleSolidColor,
+                    handleStrokeColor, mHandleStrokeSize, mHandleSize, mFrameSize, isEnableHandleMiddle
+                )
+            }
+        }
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context, attrs, defStyleAttr
+    ){
+        handleStyleable(context, attrs, defStyleAttr)
+        inflate(context, R.layout.document_scanner, this).run {
+            doOnAttach {
+                holder = findViewById(R.id.holder)
+                image = findViewById(R.id.image)
+                polygonView = findViewById(R.id.polygon_view)
+                polygonView.setImageValidListener(PolygonView.OnImageValidListener { isValid ->
+                    imageValidListener?.invoke(isValid)
+                })
+                isInitialized = true
+                // handle Styleable
+                polygonView.initStyleable(
+                    frameColor, frameColorError, handleSolidColor,
+                    handleStrokeColor, mHandleStrokeSize, mHandleSize, mFrameSize, isEnableHandleMiddle
+                )
+            }
+        }
+    }
 
     private lateinit var holder: FrameLayout
     private lateinit var image: ImageView
@@ -53,18 +111,60 @@ class DocumentScannerView @JvmOverloads constructor(
 
     private val nativeClass = NativeClass()
 
-    init {
-        inflate(context, R.layout.document_scanner, this).run {
-            doOnAttach {
-                holder = findViewById(R.id.holder)
-                image = findViewById(R.id.image)
-                polygonView = findViewById(R.id.polygon_view)
-                polygonView.setImageValidListener(PolygonView.OnImageValidListener { isValid ->
-                    imageValidListener?.invoke(isValid)
-                })
-                isInitialized = true
-            }
-        }
+    private var frameColor = ActivityCompat.getColor(context, R.color.blue)
+    private var frameColorError = ActivityCompat.getColor(context, R.color.red)
+    private var handleSolidColor = ActivityCompat.getColor(context, R.color.polygonViewCircleBackground)
+    private var handleStrokeColor = ActivityCompat.getColor(context, R.color.polygonViewCircleStrokeColor)
+    private var mHandleStrokeSize = 0
+    private var mHandleSize = 0
+    private var mFrameSize = 0
+    private var isEnableHandleMiddle = false
+
+
+    private fun handleStyleable(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
+        val ta = context.obtainStyledAttributes(attrs, R.styleable.documentScanner, defStyleAttr, 0)
+        frameColor = ta.getColor(
+            R.styleable.documentScanner_cds_frame_color,
+            ActivityCompat.getColor(context, R.color.blue)
+        )
+        frameColorError = ta.getColor(
+            R.styleable.documentScanner_cds_frame_color_error,
+            ActivityCompat.getColor(context, R.color.red)
+        )
+        handleSolidColor = ta.getColor(
+            R.styleable.documentScanner_cds_handle_solid_color,
+            ActivityCompat.getColor(context, R.color.polygonViewCircleBackground)
+        )
+        handleStrokeColor = ta.getColor(
+            R.styleable.documentScanner_cds_handle_stroke_color,
+            ActivityCompat.getColor(context, R.color.polygonViewCircleStrokeColor)
+        )
+        val mDensity = getDensity()
+
+        mHandleStrokeSize = ta.getDimensionPixelSize(
+            R.styleable.documentScanner_cds_handle_stroke_size,
+            (2 * mDensity).toInt()
+        )
+
+        mHandleSize = ta.getDimensionPixelSize(
+            R.styleable.documentScanner_cds_handle_size,
+            (20 * mDensity).toInt()
+        )
+
+        mFrameSize = ta.getDimensionPixelSize(
+            R.styleable.documentScanner_cds_frame_size,
+            (2 * mDensity).toInt()
+        )
+        isEnableHandleMiddle =
+            ta.getBoolean(R.styleable.documentScanner_cds_handle_middle_enabled, true)
+    }
+
+    // Utility /////////////////////////////////////////////////////////////////////////////////////
+    private fun getDensity(): Float {
+        val displayMetrics = DisplayMetrics()
+        (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+            .getMetrics(displayMetrics)
+        return displayMetrics.density
     }
 
     private fun initView() {
@@ -123,7 +223,8 @@ class DocumentScannerView @JvmOverloads constructor(
         val pointFs = getEdgePoints(tempBitmap)
         polygonView.points = pointFs
         polygonView.visibility = VISIBLE
-        val padding = resources.getDimension(R.dimen.scanPadding).toInt() * 2
+//        val padding = resources.getDimension(R.dimen.scanPadding).toInt() * 2
+        val padding = mHandleSize
         val layoutParams =
             LayoutParams(tempBitmap.width + padding, tempBitmap.height + padding)
         layoutParams.gravity = Gravity.CENTER
@@ -197,7 +298,7 @@ class DocumentScannerView @JvmOverloads constructor(
         onLoad = listener
     }
 
-    fun setImageValidListener(listener: OnImageValidListener){
+    fun setImageValidListener(listener: OnImageValidListener) {
         this.imageValidListener = listener
     }
 

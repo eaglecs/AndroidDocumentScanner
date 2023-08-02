@@ -10,9 +10,11 @@
 <resources>
 
     // Scanner Colors
+
+    <color name="red">#CF3833</color>
     <color name="blue">#5873ED</color>
     <color name="orange">#ffff900d</color>
     <color name="polygonViewCircleStrokeColor">#5873ED</color>
-    <color name="polygonViewCircleBackground">#BFC7D6FF</color>
+    <color name="polygonViewCircleBackground">#805873ED</color>
     //
 </resources>

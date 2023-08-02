@@ -8,6 +8,7 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
@@ -30,7 +31,9 @@
                     android:layout_height="0dp"
                     android:layout_gravity="center"
                     android:layout_margin="10dp"
-                    android:layout_weight="10" />
+                    android:layout_weight="10"
+                    app:cds_handle_size="10dp"
+                    app:cds_handle_solid_color="@color/polygonViewCircleBackground" />
 
             <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvImageInvalid"

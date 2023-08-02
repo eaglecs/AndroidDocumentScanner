@@ -13,6 +13,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -53,6 +54,63 @@ public class PolygonView extends FrameLayout {
     private ImageView midPointer24;
     private PolygonView polygonView;
     private Magnifier magnifier;
+    private int frameColor;
+    private int frameColorError;
+    private int handleSolidColor;
+    private int handleStrokeColor;
+    private int mHandleStrokeSize;
+    private int mHandleSize;
+    private int mFrameSize;
+    private boolean isEnableHandleMiddle;
+
+    public void initStyleable(int frameColor, int frameColorError, int handleSolidColor, int handleStrokeColor, int mHandleStrokeSize, int mHandleSize, int mFrameSize, boolean isEnableHandleMiddle) {
+        this.frameColor = frameColor;
+        this.frameColorError = frameColorError;
+        this.mFrameSize = mFrameSize;
+
+        this.handleSolidColor = handleSolidColor;
+        this.handleStrokeColor = handleStrokeColor;
+        this.mHandleStrokeSize = mHandleStrokeSize;
+        this.mHandleSize = mHandleSize;
+
+        this.isEnableHandleMiddle = isEnableHandleMiddle;
+        setDataStyleable();
+    }
+
+    private void setDataStyleable() {
+        if (paint != null) {
+            paint.setColor(frameColor);
+            paint.setStrokeWidth(mFrameSize);
+        }
+        if (pointer1!= null){
+
+            GradientDrawable shape = new GradientDrawable();
+            shape.setShape(GradientDrawable.OVAL);
+            shape.setSize(mHandleSize, mHandleSize);
+            shape.setColor(handleSolidColor);
+            shape.setStroke(mHandleStrokeSize, handleStrokeColor);
+            pointer1.setImageDrawable(shape);
+            pointer2.setImageDrawable(shape);
+            pointer3.setImageDrawable(shape);
+            pointer4.setImageDrawable(shape);
+
+            midPointer13.setImageDrawable(shape);
+            midPointer12.setImageDrawable(shape);
+            midPointer34.setImageDrawable(shape);
+            midPointer24.setImageDrawable(shape);
+            if (isEnableHandleMiddle) {
+                midPointer13.setVisibility(VISIBLE);
+                midPointer12.setVisibility(VISIBLE);
+                midPointer34.setVisibility(VISIBLE);
+                midPointer24.setVisibility(VISIBLE);
+            } else {
+                midPointer13.setVisibility(GONE);
+                midPointer12.setVisibility(GONE);
+                midPointer34.setVisibility(GONE);
+                midPointer24.setVisibility(GONE);
+            }
+        }
+    }
 
     public PolygonView(Context context) {
         super(context);
@@ -267,10 +325,6 @@ public class PolygonView extends FrameLayout {
         return imageView;
     }
 
-    public void setImageValidListener(@Nullable Function1<? super Boolean, Unit> listener) {
-
-    }
-
     private OnImageValidListener imageValidListener;
 
     public void setImageValidListener(OnImageValidListener l) {
@@ -336,9 +390,9 @@ public class PolygonView extends FrameLayout {
                     boolean validShape = isValidShape(getPoints());
                     handleImageValid(validShape);
                     if (validShape) {
-                        color = getResources().getColor(R.color.blue);
+                        color = frameColor;
                     } else {
-                        color = getResources().getColor(R.color.orange);
+                        color = frameColorError;
                     }
                     paint.setColor(color);
                     dismissMag();
@@ -388,9 +442,9 @@ public class PolygonView extends FrameLayout {
                     boolean validShape = isValidShape(getPoints());
                     handleImageValid(validShape);
                     if (validShape) {
-                        color = getResources().getColor(R.color.blue);
+                        color = frameColor;
                     } else {
-                        color = getResources().getColor(R.color.orange);
+                        color = frameColorError;
                     }
                     paint.setColor(color);
                     dismissMag();
