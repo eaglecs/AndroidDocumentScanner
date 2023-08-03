@@ -7,6 +7,7 @@
         <attr name="cds_handle_stroke_color" format="reference|color" />
         <attr name="cds_frame_size" format="dimension" />
         <attr name="cds_handle_stroke_size" format="dimension" />
+        <attr name="cds_padding_handle_init" format="dimension" />
         <attr name="cds_handle_size" format="dimension" />
         <attr name="cds_handle_middle_enabled" format="boolean" />
     </declare-styleable>

@@ -61,7 +61,8 @@ class DocumentScannerView : FrameLayout{
                 // handle Styleable
                 polygonView.initStyleable(
                     frameColor, frameColorError, handleSolidColor,
-                    handleStrokeColor, mHandleStrokeSize, mHandleSize, mFrameSize, isEnableHandleMiddle
+                    handleStrokeColor, mHandleStrokeSize, mHandleSize, mFrameSize, isEnableHandleMiddle,
+                    paddingHandleInit
                 )
             }
         }
@@ -83,7 +84,7 @@ class DocumentScannerView : FrameLayout{
                 // handle Styleable
                 polygonView.initStyleable(
                     frameColor, frameColorError, handleSolidColor,
-                    handleStrokeColor, mHandleStrokeSize, mHandleSize, mFrameSize, isEnableHandleMiddle
+                    handleStrokeColor, mHandleStrokeSize, mHandleSize, mFrameSize, isEnableHandleMiddle, paddingHandleInit
                 )
             }
         }
@@ -117,6 +118,7 @@ class DocumentScannerView : FrameLayout{
     private var handleStrokeColor = ActivityCompat.getColor(context, R.color.polygonViewCircleStrokeColor)
     private var mHandleStrokeSize = 0
     private var mHandleSize = 0
+    private var paddingHandleInit = 0
     private var mFrameSize = 0
     private var isEnableHandleMiddle = false
 
@@ -150,6 +152,8 @@ class DocumentScannerView : FrameLayout{
             R.styleable.documentScanner_cds_handle_size,
             (20 * mDensity).toInt()
         )
+
+        paddingHandleInit = ta.getDimensionPixelSize(R.styleable.documentScanner_cds_padding_handle_init, 0)
 
         mFrameSize = ta.getDimensionPixelSize(
             R.styleable.documentScanner_cds_frame_size,

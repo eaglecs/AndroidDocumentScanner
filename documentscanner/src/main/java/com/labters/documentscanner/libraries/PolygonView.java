@@ -16,9 +16,11 @@ import android.graphics.PointF;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Magnifier;
@@ -61,9 +63,10 @@ public class PolygonView extends FrameLayout {
     private int mHandleStrokeSize;
     private int mHandleSize;
     private int mFrameSize;
+    private int paddingHandleInit = 0;
     private boolean isEnableHandleMiddle;
 
-    public void initStyleable(int frameColor, int frameColorError, int handleSolidColor, int handleStrokeColor, int mHandleStrokeSize, int mHandleSize, int mFrameSize, boolean isEnableHandleMiddle) {
+    public void initStyleable(int frameColor, int frameColorError, int handleSolidColor, int handleStrokeColor, int mHandleStrokeSize, int mHandleSize, int mFrameSize, boolean isEnableHandleMiddle, int paddingHandleInit) {
         this.frameColor = frameColor;
         this.frameColorError = frameColorError;
         this.mFrameSize = mFrameSize;
@@ -72,6 +75,7 @@ public class PolygonView extends FrameLayout {
         this.handleStrokeColor = handleStrokeColor;
         this.mHandleStrokeSize = mHandleStrokeSize;
         this.mHandleSize = mHandleSize;
+        this.paddingHandleInit = paddingHandleInit;
 
         this.isEnableHandleMiddle = isEnableHandleMiddle;
         setDataStyleable();
@@ -82,7 +86,7 @@ public class PolygonView extends FrameLayout {
             paint.setColor(frameColor);
             paint.setStrokeWidth(mFrameSize);
         }
-        if (pointer1!= null){
+        if (pointer1 != null) {
 
             GradientDrawable shape = new GradientDrawable();
             shape.setShape(GradientDrawable.OVAL);
@@ -132,21 +136,24 @@ public class PolygonView extends FrameLayout {
 
     private void init() {
         polygonView = this;
-        pointer1 = getImageView(0, 0);
-        pointer2 = getImageView(getWidth(), 0);
-        pointer3 = getImageView(0, getHeight());
-        pointer4 = getImageView(getWidth(), getHeight());
+
+        pointer1 = getImageView(paddingHandleInit, paddingHandleInit);
+        pointer2 = getImageView(getWidth() - paddingHandleInit, paddingHandleInit);
+        pointer3 = getImageView(paddingHandleInit, getHeight()- paddingHandleInit);
+        pointer4 = getImageView(getWidth() - paddingHandleInit, getHeight() - paddingHandleInit);
+
+
+
         midPointer13 = getImageView(0, getHeight() / 2);
+        midPointer12 = getImageView(0, getWidth() / 2);
+        midPointer34 = getImageView(0, getHeight() / 2);
+        midPointer24 = getImageView(0, getHeight() / 2);
+
         midPointer13.setOnTouchListener(new MidPointTouchListenerImpl(pointer1, pointer3));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
             magnifier = new Magnifier(polygonView);
-        midPointer12 = getImageView(0, getWidth() / 2);
         midPointer12.setOnTouchListener(new MidPointTouchListenerImpl(pointer1, pointer2));
-
-        midPointer34 = getImageView(0, getHeight() / 2);
         midPointer34.setOnTouchListener(new MidPointTouchListenerImpl(pointer3, pointer4));
-
-        midPointer24 = getImageView(0, getHeight() / 2);
         midPointer24.setOnTouchListener(new MidPointTouchListenerImpl(pointer2, pointer4));
 
         addView(pointer1);
@@ -227,17 +234,37 @@ public class PolygonView extends FrameLayout {
     }
 
     private void setPointsCoordinates(Map<Integer, PointF> pointFMap) {
-        pointer1.setX(pointFMap.get(0).x);
-        pointer1.setY(pointFMap.get(0).y);
+        float xPoint1 = pointFMap.get(0).x;
+        float yPoint1 = pointFMap.get(0).y;
+        float xPoint2 = pointFMap.get(1).x;
+        float yPoint2 = pointFMap.get(1).y;
+        float xPoint3 = pointFMap.get(2).x;
+        float yPoint3 = pointFMap.get(2).y;
+        float xPoint4 = pointFMap.get(3).x;
+        float yPoint4 = pointFMap.get(3).y;
 
-        pointer2.setX(pointFMap.get(1).x);
-        pointer2.setY(pointFMap.get(1).y);
+        if (xPoint1 == yPoint1 && xPoint1 == 0){
+            xPoint1 = paddingHandleInit;
+            yPoint1 = paddingHandleInit;
 
-        pointer3.setX(pointFMap.get(2).x);
-        pointer3.setY(pointFMap.get(2).y);
+            xPoint2 = xPoint2 - paddingHandleInit;
+            yPoint2 = paddingHandleInit;
 
-        pointer4.setX(pointFMap.get(3).x);
-        pointer4.setY(pointFMap.get(3).y);
+            xPoint3 = paddingHandleInit;
+            yPoint3 = yPoint3 - paddingHandleInit;
+
+            xPoint4 = xPoint4 - paddingHandleInit;
+            yPoint4 = yPoint4 - paddingHandleInit;
+        }
+
+        pointer1.setX(xPoint1);
+        pointer1.setY(yPoint1);
+        pointer2.setX(xPoint2);
+        pointer2.setY(yPoint2);
+        pointer3.setX(xPoint3);
+        pointer3.setY(yPoint3);
+        pointer4.setX(xPoint4);
+        pointer4.setY(yPoint4);
     }
 
     @Override

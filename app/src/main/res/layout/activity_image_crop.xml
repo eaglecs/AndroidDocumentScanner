@@ -32,7 +32,8 @@
                     android:layout_gravity="center"
                     android:layout_margin="10dp"
                     android:layout_weight="10"
-                    app:cds_handle_size="10dp"
+                    app:cds_handle_size="20dp"
+                    app:cds_padding_handle_init="20dp"
                     app:cds_handle_solid_color="@color/polygonViewCircleBackground" />
 
             <androidx.appcompat.widget.AppCompatTextView
