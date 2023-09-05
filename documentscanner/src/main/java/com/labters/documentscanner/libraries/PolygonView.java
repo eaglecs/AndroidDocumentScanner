@@ -16,28 +16,21 @@ import android.graphics.PointF;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Magnifier;
 
 import com.labters.documentscanner.R;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
+import java.util.Objects;
 
 /**
  * Created by jhansi on 28/03/15.
@@ -234,14 +227,14 @@ public class PolygonView extends FrameLayout {
     }
 
     private void setPointsCoordinates(Map<Integer, PointF> pointFMap) {
-        float xPoint1 = pointFMap.get(0).x;
-        float yPoint1 = pointFMap.get(0).y;
-        float xPoint2 = pointFMap.get(1).x;
-        float yPoint2 = pointFMap.get(1).y;
-        float xPoint3 = pointFMap.get(2).x;
-        float yPoint3 = pointFMap.get(2).y;
-        float xPoint4 = pointFMap.get(3).x;
-        float yPoint4 = pointFMap.get(3).y;
+        float xPoint1 = Objects.requireNonNull(pointFMap.get(0)).x;
+        float yPoint1 = Objects.requireNonNull(pointFMap.get(0)).y;
+        float xPoint2 = Objects.requireNonNull(pointFMap.get(1)).x;
+        float yPoint2 = Objects.requireNonNull(pointFMap.get(1)).y;
+        float xPoint3 = Objects.requireNonNull(pointFMap.get(2)).x;
+        float yPoint3 = Objects.requireNonNull(pointFMap.get(2)).y;
+        float xPoint4 = Objects.requireNonNull(pointFMap.get(3)).x;
+        float yPoint4 = Objects.requireNonNull(pointFMap.get(3)).y;
 
         if (xPoint1 == yPoint1 && xPoint1 == 0){
             xPoint1 = paddingHandleInit;

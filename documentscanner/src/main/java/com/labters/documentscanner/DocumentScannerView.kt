@@ -96,6 +96,7 @@ class DocumentScannerView : FrameLayout{
 
     private lateinit var selectedImage: Bitmap
     private var isInitialized = false
+    private val diffDistance = 180
 
     private var onLoad: OnLoadListener? = {
         Log.i(javaClass.simpleName, "loading = $it")
@@ -278,15 +279,16 @@ class DocumentScannerView : FrameLayout{
         val xRatio: Float = selectedImage.width.toFloat() / image.width
         val yRatio: Float = selectedImage.height.toFloat() / image.height
         val x1 = points[0]!!.x * xRatio
-        val x2 = points[1]!!.x * xRatio
+        val x2 = points[1]!!.x * xRatio + diffDistance
         val x3 = points[2]!!.x * xRatio
-        val x4 = points[3]!!.x * xRatio
+        val x4 = points[3]!!.x * xRatio + diffDistance
         val y1 = points[0]!!.y * yRatio
         val y2 = points[1]!!.y * yRatio
         val y3 = points[2]!!.y * yRatio
         val y4 = points[3]!!.y * yRatio
         val finalBitmap: Bitmap = selectedImage.copy(selectedImage.config, true)
         return nativeClass.getScannedBitmap(finalBitmap, x1, y1, x2, y2, x3, y3, x4, y4)
+//        return finalBitmap
     }
 
     private fun doWhenInitialised(function: () -> Unit) {

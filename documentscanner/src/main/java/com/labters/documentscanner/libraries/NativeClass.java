@@ -73,8 +73,7 @@ public class NativeClass {
         }
         Collections.sort(rectangles, AreaDescendingComparator);
         MatOfPoint2f largestRectangle = rectangles.get(0);
-        MatOfPoint2f result = MathUtils.scaleRectangle(largestRectangle, 1f / ratio);
-        return result;
+        return MathUtils.scaleRectangle(largestRectangle, 1f / ratio);
     }
 
     //public native float[] getPoints(Bitmap bitmap);
