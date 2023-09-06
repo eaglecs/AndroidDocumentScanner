@@ -29,25 +29,26 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.opencv.core.MatOfPoint2f
 
-class DocumentScannerView : FrameLayout{
+class DocumentScannerView : FrameLayout {
 
-    constructor(context: Context) : super(context){
+    constructor(context: Context) : super(context) {
         inflate(context, R.layout.document_scanner, this).run {
             doOnAttach {
                 holder = findViewById(R.id.holder)
                 image = findViewById(R.id.image)
                 polygonView = findViewById(R.id.polygon_view)
-                polygonView.setImageValidListener(PolygonView.OnImageValidListener { isValid ->
+                polygonView.setImageValidListener { isValid ->
                     imageValidListener?.invoke(isValid)
-                })
+                }
                 isInitialized = true
                 // handle Styleable
             }
         }
     }
+
     constructor(context: Context, attrs: AttributeSet?) : super(
         context, attrs
-    ){
+    ) {
         handleStyleable(context, attrs, 0)
         inflate(context, R.layout.document_scanner, this).run {
             doOnAttach {
@@ -60,8 +61,14 @@ class DocumentScannerView : FrameLayout{
                 isInitialized = true
                 // handle Styleable
                 polygonView.initStyleable(
-                    frameColor, frameColorError, handleSolidColor,
-                    handleStrokeColor, mHandleStrokeSize, mHandleSize, mFrameSize, isEnableHandleMiddle,
+                    frameColor,
+                    frameColorError,
+                    handleSolidColor,
+                    handleStrokeColor,
+                    mHandleStrokeSize,
+                    mHandleSize,
+                    mFrameSize,
+                    isEnableHandleMiddle,
                     paddingHandleInit
                 )
             }
@@ -70,7 +77,7 @@ class DocumentScannerView : FrameLayout{
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context, attrs, defStyleAttr
-    ){
+    ) {
         handleStyleable(context, attrs, defStyleAttr)
         inflate(context, R.layout.document_scanner, this).run {
             doOnAttach {
@@ -83,8 +90,15 @@ class DocumentScannerView : FrameLayout{
                 isInitialized = true
                 // handle Styleable
                 polygonView.initStyleable(
-                    frameColor, frameColorError, handleSolidColor,
-                    handleStrokeColor, mHandleStrokeSize, mHandleSize, mFrameSize, isEnableHandleMiddle, paddingHandleInit
+                    frameColor,
+                    frameColorError,
+                    handleSolidColor,
+                    handleStrokeColor,
+                    mHandleStrokeSize,
+                    mHandleSize,
+                    mFrameSize,
+                    isEnableHandleMiddle,
+                    paddingHandleInit
                 )
             }
         }
@@ -96,8 +110,6 @@ class DocumentScannerView : FrameLayout{
 
     private lateinit var selectedImage: Bitmap
     private var isInitialized = false
-    private val diffDistance = 180
-
     private var onLoad: OnLoadListener? = {
         Log.i(javaClass.simpleName, "loading = $it")
     }
@@ -115,8 +127,10 @@ class DocumentScannerView : FrameLayout{
 
     private var frameColor = ActivityCompat.getColor(context, R.color.blue)
     private var frameColorError = ActivityCompat.getColor(context, R.color.red)
-    private var handleSolidColor = ActivityCompat.getColor(context, R.color.polygonViewCircleBackground)
-    private var handleStrokeColor = ActivityCompat.getColor(context, R.color.polygonViewCircleStrokeColor)
+    private var handleSolidColor =
+        ActivityCompat.getColor(context, R.color.polygonViewCircleBackground)
+    private var handleStrokeColor =
+        ActivityCompat.getColor(context, R.color.polygonViewCircleStrokeColor)
     private var mHandleStrokeSize = 0
     private var mHandleSize = 0
     private var paddingHandleInit = 0
@@ -154,7 +168,8 @@ class DocumentScannerView : FrameLayout{
             (20 * mDensity).toInt()
         )
 
-        paddingHandleInit = ta.getDimensionPixelSize(R.styleable.documentScanner_cds_padding_handle_init, 0)
+        paddingHandleInit =
+            ta.getDimensionPixelSize(R.styleable.documentScanner_cds_padding_handle_init, 0)
 
         mFrameSize = ta.getDimensionPixelSize(
             R.styleable.documentScanner_cds_frame_size,
@@ -276,12 +291,13 @@ class DocumentScannerView : FrameLayout{
     @Throws
     fun getCroppedImage(): Bitmap {
         val points: Map<Int, PointF> = polygonView.points
-        val xRatio: Float = selectedImage.width.toFloat() / image.width
-        val yRatio: Float = selectedImage.height.toFloat() / image.height
+        val tempBitmap = (image.drawable as BitmapDrawable).bitmap
+        val xRatio: Float = selectedImage.width.toFloat() / tempBitmap.width
+        val yRatio: Float = selectedImage.height.toFloat() / tempBitmap.height
         val x1 = points[0]!!.x * xRatio
-        val x2 = points[1]!!.x * xRatio + diffDistance
+        val x2 = points[1]!!.x * xRatio
         val x3 = points[2]!!.x * xRatio
-        val x4 = points[3]!!.x * xRatio + diffDistance
+        val x4 = points[3]!!.x * xRatio
         val y1 = points[0]!!.y * yRatio
         val y2 = points[1]!!.y * yRatio
         val y3 = points[2]!!.y * yRatio

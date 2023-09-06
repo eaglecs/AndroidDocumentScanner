@@ -30,11 +30,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_gravity="center"
-                    android:layout_margin="10dp"
+                    android:layout_margin="32dp"
                     android:layout_weight="10"
+                    app:cds_frame_color="#5873ED"
+                    app:cds_frame_color_error="#FF4554"
+                    app:cds_frame_size="2dp"
+                    app:cds_handle_middle_enabled="true"
                     app:cds_handle_size="20dp"
-                    app:cds_padding_handle_init="20dp"
-                    app:cds_handle_solid_color="@color/polygonViewCircleBackground" />
+                    app:cds_handle_solid_color="#805873ED"
+                    app:cds_handle_stroke_color="#5873ED"
+                    app:cds_handle_stroke_size="2dp" />
 
             <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvImageInvalid"
@@ -60,7 +65,7 @@
                 android:id="@+id/result_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#ffffff"
+                android:background="#000000"
                 android:contentDescription="@null"
                 android:visibility="gone" />
 
