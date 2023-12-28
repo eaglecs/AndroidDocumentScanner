@@ -190,7 +190,7 @@ class DocumentScannerView : FrameLayout {
     private fun initView() {
         scope.launch {
             onLoad?.invoke(true)
-            setImageRotation()
+//            setImageRotation()
             initializeCropping()
             onLoad?.invoke(false)
         }
